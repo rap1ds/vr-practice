@@ -15,6 +15,7 @@ float playerPitch = 0;
 float playerRoll  = 0; 
 
 // Bacon is added only once per key stroke
+boolean prevButtonSdown = false;
 boolean baconAdded = false;
 void keyReleased() {
   if(key == ' ') {
@@ -323,6 +324,20 @@ public void myInteraction()
       buttonSdown = true;
     }
   }
+  
+  // Detect if button was just released
+  boolean buttonSdownStateChanged = prevButtonSdown != buttonSdown;
+  
+  if(buttonSdownStateChanged) {
+    // Just released
+    if(!buttonSdown) {
+      // Reset baceonAdded
+      baconAdded = false;
+    }
+  }
+  
+  // Save the buttonSdown state so that we can detect when button is released
+  prevButtonSdown = buttonSdown;
 
   // If space key or S-button is pressed down, bacon slices will spawn
   // underground (and be hurled into the sky because of JBullet's physics)
