@@ -46,6 +46,9 @@ public void setup()
 
   ruis.physicsThread.start();
   inputManager.inputThread.start();
+  
+  ImageReader imageReader = new ImageReader("/Users/mikko/Work/vr-practice/DoubleWallExample/pics"); // Change this
+  
 }
 
 public void draw()
