@@ -40,6 +40,68 @@ public class ImmaterialSphere extends PhysicalObject
   }
 }
 
+public class TextureCube extends PhysicalObject
+{
+  PImage textureImage;
+  
+  TextureCube(PVector dim, PVector loc) {
+    super(dim.x, dim.y, dim.z, 1, loc.x, loc.y, loc.z, color(255), PhysicalObject.IMMATERIAL_OBJECT);
+    
+    textureImage = imageReader.nextImage();
+  }
+  
+  public void renderAtOrigin() {
+    noStroke();
+    
+    pushMatrix();
+    scale(super.width, super.height, super.depth);
+    
+    beginShape(QUADS);
+
+    texture(this.textureImage);
+    textureMode(NORMALIZED);
+    
+    // front
+    vertex(-1, 1, 1, 0,1);
+    vertex( 1, 1, 1, 1,1);
+    vertex( 1,-1, 1, 1,0);
+    vertex(-1,-1, 1, 0,0);
+    
+    // back
+    vertex( 1, 1,-1, 0,1);
+    vertex(-1, 1,-1, 1,1);
+    vertex(-1,-1,-1, 1,0);
+    vertex( 1,-1,-1, 0,0);
+    
+    // right
+    vertex( 1, 1, 1, 0,1);
+    vertex( 1, 1,-1, 1,1);
+    vertex( 1,-1,-1, 1,0);
+    vertex( 1,-1, 1, 0,0);
+    
+    // left
+    vertex(-1, 1,-1, 0,1);
+    vertex(-1, 1, 1, 1,1);
+    vertex(-1,-1, 1, 1,0);
+    vertex(-1,-1,-1, 0,0);
+    
+    // bottom
+    vertex(-1, 1,-1, 0,1);
+    vertex( 1, 1,-1, 1,1);
+    vertex( 1, 1, 1, 1,0);
+    vertex(-1, 1, 1, 0,0);
+    
+    // top
+    vertex(-1,-1, 1, 0,1);
+    vertex( 1,-1, 1, 1,1);
+    vertex( 1,-1,-1, 1,0);
+    vertex(-1,-1,-1, 0,0);
+    
+    endShape();
+    
+    popMatrix();
+  }
+}
 /**
  * This is how you define a new kind of PhysicalObject with its own physical
  * behavior and own graphics rendering method.

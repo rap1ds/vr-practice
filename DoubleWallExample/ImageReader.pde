@@ -59,5 +59,16 @@ class ImageReader {
     
     return this.images.get(iter);
   }
+  
+  public int count() {
+    return this.images.size();
+  }
+  
+  public PImage at(int index) {
+    if (index < this.images.size())
+      return this.images.get(index);
+      
+    return null;
+  }
 }
 

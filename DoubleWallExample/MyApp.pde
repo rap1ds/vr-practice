@@ -37,37 +37,40 @@ public void mySetup()
   lookAtX = viewManager.display[0].displayCenter.x;
   lookAtY = viewManager.display[0].displayCenter.y;
   lookAtZ = viewManager.display[0].displayCenter.z;
+  
+  // Create selectable TextureCube objects
+  for (int i = 0; i < imageReader.count(); i++) {
+    PImage img = imageReader.at(i);
+    if (img == null)
+      continue;
 
-  // Add some PhysicalObjects. They carry graphical and physical properties
-  for (int i = -1; i <= 1; i++ )
-  {
-    // It is usually a good idea to keep the size of your objects relative to 
-    // the display size instead of using absolute sizes. That way it is easier
-    // to port your application to a different environment.
-    float cubeWidth = 0.05f*(2+i)*viewManager.display[0].getDisplayWidth();
-    float sphereRadius = cubeWidth;
-    float cubeMass = 50;
-    float locX =   viewManager.display[0].displayCenter.x 
-      + 0.3f*i*viewManager.display[0].getDisplayWidth();
-    float locY = ruis.getStaticFloorY() - 0.5f*cubeWidth; 
-    float locZ =   viewManager.display[0].displayCenter.z 
-      - 0.5f*viewManager.display[0].getDisplayWidth(); 
-
-    // Adds a white box that is affected by physics but can not be selected
-    ruis.addObject(new PhysicalObject(0.5f*cubeWidth, cubeWidth, 
-    0.5f*cubeWidth, cubeMass, locX, 0, locZ, 
-    color(255, 255, 255), PhysicalObject.DYNAMIC_OBJECT));
-
-    // Adds a transparent sphere that is not affected by physics and can not 
-    // be selected. See ImmaterialSphere definition in MyObjects.pde
-    ruis.addObject(new ImmaterialSphere(sphereRadius, locX, 0.5f*locY, 
-    locZ, color(240, 0, 240, 140)));
-
-    // Adds a static gray box that deflects other physical objects but is not
-    // influenced by them and can not be selected
-    ruis.addObject(new PhysicalObject(cubeWidth, cubeWidth, 
-    cubeWidth, cubeMass, locX, locY, locZ, 
-    color(110, 110, 110), PhysicalObject.STATIC_OBJECT));
+    // Suggested by RUIS to keep units uniform over different environments
+    float scaling = viewManager.display[0].getDisplayWidth();
+    
+    // spacing between two items' center location
+    float spacing = 0.1f * scaling;
+    
+    // radius of the "spiral"
+    float radius = 0.1f * scaling;
+    
+    float aspect = (float)img.height / (float)img.width;
+    
+    // size of the cube
+    float width = 0.2f * scaling;
+    float height = 0.2f * aspect * scaling;
+    float depth = 0.02f * scaling; // actually half-depth
+    
+    // calculate offset in polar coordinates for (x,y)
+    float t = ((float)i / imageReader.count()) * TWO_PI;
+    float locX = viewManager.display[0].displayCenter.x + radius * cos(t);
+    float locY = viewManager.display[0].displayCenter.y + radius * sin(t);
+    float locZ = viewManager.display[0].displayCenter.z - i * spacing;
+    
+    // Create a selectable texture cube object
+    TextureCube cubeObj = new TextureCube(new PVector(width, height, depth), new PVector(locX, locY, locZ));
+    
+    SelectableObject selCube = new SelectableObject(cubeObj);
+    ruis.addObject(selCube);
   }
 
   // Add a selectable, green switch on the view HUD, which can be interacted
