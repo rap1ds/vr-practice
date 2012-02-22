@@ -3,7 +3,7 @@
 // Your global variables:
 int sphereCount = 0;
 int baconCount = 0;
-	
+
 float playerX =  0; 
 float playerY =  0; 
 float playerZ =  0; 
@@ -14,17 +14,25 @@ float playerYaw   = 0;
 float playerPitch = 0; 
 float playerRoll  = 0; 
 
+// Bacon is added only once per key stroke
+boolean baconAdded = false;
+void keyReleased() {
+  if(key == ' ') {
+    baconAdded = false;
+  }
+}
+
 PVector incrementalMove = new PVector(0, 0, 0);
 
 // This function is called only once in the setup() function
 public void mySetup()
 { 
   viewManager.setDisplayGridDraw(false);
-  
+
   playerX = viewManager.getHeadX();
   playerY = viewManager.getHeadY();
   playerZ = viewManager.getHeadZ();
-		
+
   lookAtX = viewManager.display[0].displayCenter.x;
   lookAtY = viewManager.display[0].displayCenter.y;
   lookAtZ = viewManager.display[0].displayCenter.z;
@@ -39,47 +47,47 @@ public void mySetup()
     float sphereRadius = cubeWidth;
     float cubeMass = 50;
     float locX =   viewManager.display[0].displayCenter.x 
-                 + 0.3f*i*viewManager.display[0].getDisplayWidth();
+      + 0.3f*i*viewManager.display[0].getDisplayWidth();
     float locY = ruis.getStaticFloorY() - 0.5f*cubeWidth; 
     float locZ =   viewManager.display[0].displayCenter.z 
-                 - 0.5f*viewManager.display[0].getDisplayWidth(); 
+      - 0.5f*viewManager.display[0].getDisplayWidth(); 
 
     // Adds a white box that is affected by physics but can not be selected
     ruis.addObject(new PhysicalObject(0.5f*cubeWidth, cubeWidth, 
-                                  0.5f*cubeWidth, cubeMass, locX, 0, locZ, 
-                                  color(255, 255, 255), PhysicalObject.DYNAMIC_OBJECT));
+    0.5f*cubeWidth, cubeMass, locX, 0, locZ, 
+    color(255, 255, 255), PhysicalObject.DYNAMIC_OBJECT));
 
     // Adds a transparent sphere that is not affected by physics and can not 
     // be selected. See ImmaterialSphere definition in MyObjects.pde
     ruis.addObject(new ImmaterialSphere(sphereRadius, locX, 0.5f*locY, 
-                                        locZ, color(240, 0, 240, 140)));
+    locZ, color(240, 0, 240, 140)));
 
     // Adds a static gray box that deflects other physical objects but is not
     // influenced by them and can not be selected
     ruis.addObject(new PhysicalObject(cubeWidth, cubeWidth, 
-                                  cubeWidth, cubeMass, locX, locY, locZ, 
-                                  color(110, 110, 110), PhysicalObject.STATIC_OBJECT));
+    cubeWidth, cubeMass, locX, locY, locZ, 
+    color(110, 110, 110), PhysicalObject.STATIC_OBJECT));
   }
-	  
+
   // Add a selectable, green switch on the view HUD, which can be interacted
   // with, but is not affected by physics
   float switchLenght = 0.15f*viewManager.display[0].getDisplayHeight();
 
   PhysicalObject switchObj = 
-           new PhysicalObject(switchLenght, switchLenght, switchLenght, 
-                              0 /* mass */, 0 /* locX */, 0 /* locY */, 
-                              0 /* locZ */, color(0, 255, 55), 
-                              PhysicalObject.IMMATERIAL_OBJECT         );
-  
+    new PhysicalObject(switchLenght, switchLenght, switchLenght, 
+  0 /* mass */, 0 /* locX */, 0 /* locY */, 
+  0 /* locZ */, color(0, 255, 55), 
+  PhysicalObject.IMMATERIAL_OBJECT         );
+
   float screenRelativeX = 0.1f;
   float screenRelativeY = 0.9f;
   // SelectableSwitch contains interaction behavior, see its definition in 
   // MyObjects.pde
   SelectableSwitch selSwitch = new SelectableSwitch(switchObj, 
-                                                    screenRelativeX,
-                                                    screenRelativeY );
+  screenRelativeX, 
+  screenRelativeY );
   ruis.addObject(selSwitch);
-	  
+
   // Here are some different ways to access different wands (controllers)
   // Setting initial locations
   wiimote[0].x = viewManager.display[0].displayCenter.x;   // also wiimote0
@@ -87,12 +95,12 @@ public void mySetup()
   wiimote[0].z = viewManager.display[0].displayCenter.z;
   //skewand[0] == skewand0 etc.
   // psmove[3] == psmove3
-  if(wand3 != null)
+  if (wand3 != null)
   {
     wand3.x = viewManager.display[0].displayCenter.x 
-                            - 0.3f*viewManager.display[0].getDisplayWidth();
+      - 0.3f*viewManager.display[0].getDisplayWidth();
     wand3.y = viewManager.display[0].displayCenter.y
-                            - 0.3f*viewManager.display[0].getDisplayHeight();
+      - 0.3f*viewManager.display[0].getDisplayHeight();
     wand3.z = viewManager.display[0].displayCenter.z;
   }
 }
@@ -115,12 +123,12 @@ public void myDraw(int viewID)
 
   // Lights
   lightSetup();
-  
+
   ruis.drawWands(1.f);
   ruis.drawSelectables();
   ruis.drawPlainObjects();
   ruis.drawSelectionRanges(); // Only if selection button is pressed
-	  
+
   // Draw frames around the walls in world coordinates
   viewManager.drawWallFrames();
 
@@ -128,7 +136,7 @@ public void myDraw(int viewID)
   pushMatrix();
   skeletonManager.drawSkeletons(true, true, true);
   popMatrix();
-	  
+
   // Draw a yellow cross at the location where the camera points at
   pushMatrix();
   noStroke();
@@ -137,17 +145,17 @@ public void myDraw(int viewID)
   box(4);
   box(2, 10, 2);
   popMatrix();
-  
+
   // Draw some tiles on floor
-  for(int i=-2;i<4;++i)
-    for(int j=-2;j<4;++j)
+  for (int i=-2;i<4;++i)
+    for (int j=-2;j<4;++j)
     {
       float tileHeight = 5;
       pushMatrix();
       fill(0, 80*j, 230-70*i);
-      translate(viewManager.display[0].displayCenter.x + i*40,
-                ruis.getStaticFloorY() + 0.5f*tileHeight,
-                viewManager.display[0].displayCenter.z -(j+2)*40);
+      translate(viewManager.display[0].displayCenter.x + i*40, 
+      ruis.getStaticFloorY() + 0.5f*tileHeight, 
+      viewManager.display[0].displayCenter.z -(j+2)*40);
       box(20, tileHeight, 20);
       popMatrix();
     }
@@ -159,9 +167,9 @@ public void myDraw(int viewID)
   float relativeScreenX = 0.1f; 
   float relativeScreenY = 0.1f;
   int displayID = 0;
-  translate(screen2WorldX(relativeScreenX, relativeScreenY, displayID),
-            screen2WorldY(relativeScreenX, relativeScreenY, displayID),
-            screen2WorldZ(relativeScreenX, relativeScreenY, displayID) );
+  translate(screen2WorldX(relativeScreenX, relativeScreenY, displayID), 
+  screen2WorldY(relativeScreenX, relativeScreenY, displayID), 
+  screen2WorldZ(relativeScreenX, relativeScreenY, displayID) );
   // The RUIScamera rotation needs to be negated so that the HUD
   // object keeps facing the viewport
   inverseCameraRotation();
@@ -171,48 +179,48 @@ public void myDraw(int viewID)
   popMatrix();
 
   pushMatrix();
-	  
+
   // If you just want to draw graphics on the HUD that are not
   // represented as PhysicalOjects, then it's more simple
   // to negate both the rotation AND translation of RUIScamera 
   // transformation and draw items where the display screens are
   inverseCameraTransform();
-  
+
   // Draw a yellow box fixed in view HUD, near top right corner
   pushMatrix();
   translate(viewManager.display[0].displayCenter.x
-                 + 0.4f*viewManager.display[0].getDisplayWidth(),
-            viewManager.display[0].displayCenter.y
-                 - 0.4f*viewManager.display[0].getDisplayHeight(), 
-            viewManager.display[0].displayCenter.z                );
+    + 0.4f*viewManager.display[0].getDisplayWidth(), 
+  viewManager.display[0].displayCenter.y
+    - 0.4f*viewManager.display[0].getDisplayHeight(), 
+  viewManager.display[0].displayCenter.z                );
   fill(255, 255, 0);
   box(0.2f*boxWidth, boxWidth, 0.2f*boxWidth);
   popMatrix();
-  
+
   // Example: Draw a wireframe box in front and above of the wand0
   noFill();
   stroke(255);
   pushMatrix();
-  translate(wand0.x,
-            wand0.y - 3,      // Translate above
-            wand0.z - 3    ); // Translate in front
+  translate(wand0.x, 
+  wand0.y - 3, // Translate above
+  wand0.z - 3    ); // Translate in front
   wand0.applyRotation();
   box(2);
   popMatrix();
 
   popMatrix();
-	  
+
   relativeScreenX = 0.8f;
   relativeScreenY = 0.95f;
   // Render magenta text in a fixed position on the view HUD
   viewManager.renderText("Bacon: " + Integer.toString(baconCount), 
-                         relativeScreenX, relativeScreenY, 
-                         color(255, 130, 255), 1 /* textScale */, 
-                         displayID                                );
+  relativeScreenX, relativeScreenY, 
+  color(255, 130, 255), 1 /* textScale */, 
+  displayID                                );
   viewManager.renderText("Spheres: " + Integer.toString(sphereCount), 
-                         relativeScreenX, relativeScreenY-0.1f, 
-                         color(255, 130, 255), 1 /* textScale */, 
-                         displayID                               ); 
+  relativeScreenX, relativeScreenY-0.1f, 
+  color(255, 130, 255), 1 /* textScale */, 
+  displayID                               ); 
 
   // Draws edge lines of all RigidBodies. Should only be used for 
   // debugging physics, because this function uses slow drawing methods
@@ -233,14 +241,14 @@ public void myInteraction()
   // Use ruisCamera() method instead of camera(). ruisCamera() accepts the
   // same arguments and behaves seemingly identically to camera() function. 
   // Example: \     Camera center      /  \    Point to look at    /  \  Up /
-  ruisCamera( playerX, playerY, playerZ,  lookAtX, lookAtY, lookAtZ,  0f, 1f, 0f);
+  ruisCamera( playerX, playerY, playerZ, lookAtX, lookAtY, lookAtZ, 0f, 1f, 0f);
   // In the above example the camera can get seemingly stuck in north and south
   // poles of the lookAt point. Use an interactive up vector to avoid that.
 
   // A simple first person point of view controlling scheme (uncomment to test)
   //ruisCameraLocation(playerX, playerY, playerZ); // wasd-keys
   //ruisCameraRotation(playerYaw, playerPitch, playerRoll); // z,x,c,v,b,n keys
-  
+
   // This is how you can match camera rotation to wand's rotation
   //ruisCameraRotation(wand[0].yaw, wand[0].pitch, wand[0].roll); 
 
@@ -251,33 +259,33 @@ public void myInteraction()
   //           viewManager.display[0].displayCenter.y, 
   //           viewManager.display[0].displayCenter.z - radius*cos(theta), 
   //           lookAtX, lookAtY, lookAtZ, 0, 1, 0                         ); 
-  
+
   // Control camera (player) location with aswd-keys or wand0
   incrementalMove.set(0, 0, 0);
-  if( wand[0].buttonO      || (keyPressed && key == 's' ))
+  if ( wand[0].buttonO      || (keyPressed && key == 's' ))
     incrementalMove.sub(getCameraForward());
-  if( wand[0].buttonT      || (keyPressed && key == 'w' ))
+  if ( wand[0].buttonT      || (keyPressed && key == 'w' ))
     incrementalMove.add(getCameraForward());
-  if( wand[0].buttonSelect || (keyPressed && key == 'a' ))
+  if ( wand[0].buttonSelect || (keyPressed && key == 'a' ))
     incrementalMove.sub(getCameraRight());
-  if( wand[0].buttonStart  || (keyPressed && key == 'd' ))
+  if ( wand[0].buttonStart  || (keyPressed && key == 'd' ))
     incrementalMove.add(getCameraRight());
-  if( wand[0].buttonHome   || (keyPressed && key == 'q' ))
+  if ( wand[0].buttonHome   || (keyPressed && key == 'q' ))
     incrementalMove.sub(getCameraUp());
-  if( wand[0].buttonMove   || (keyPressed && key == 'e' ))
+  if ( wand[0].buttonMove   || (keyPressed && key == 'e' ))
     incrementalMove.add(viewManager.getCameraUp());
-    
+
   float moveSpeed = 5;
   playerX += moveSpeed*incrementalMove.x;
   playerY += moveSpeed*incrementalMove.y;
   playerZ += moveSpeed*incrementalMove.z;
-  
+
   // If wand0 is a mouse, you can simulate the 3-axis rotation
-  if(wand0 instanceof MouseWand)
-  	wand[0].simulateRotation(1.5f);
-  
+  if (wand0 instanceof MouseWand)
+    wand[0].simulateRotation(1.5f);
+
   // X-button of of wand0 is simulated with right mouse button.
-  if( wand[0].buttonX )
+  if ( wand[0].buttonX )
   {
     // Shoot into the scene a new physically simulated, white cube projectile 
     // that can be selected by the user. 
@@ -289,49 +297,55 @@ public void myInteraction()
 
     // Create the projectile's graphical and physics simulation representation
     PhysicalObject wandProjectile = 
-             new PhysicalObject(cubeSideLenght, cubeSideLenght, 
-                                cubeSideLenght, cubeMass, locX, locY, locZ, 
-                                color(255, 200, 235), PhysicalObject.DYNAMIC_OBJECT);
-    
+      new PhysicalObject(cubeSideLenght, cubeSideLenght, 
+    cubeSideLenght, cubeMass, locX, locY, locZ, 
+    color(255, 200, 235), PhysicalObject.DYNAMIC_OBJECT);
+
     // Equip that representation with basic interaction features from SelectableObject
     SelectableObject selProje = new SelectableObject(wandProjectile);
-    
+
     // Launch the projectile into the direction where the wand is pointing 
     selProje.rigidBody.setLinearVelocity(
-                              new Vector3f(100*wand[0].vectForwardWorld.x, 
-                                           100*wand[0].vectForwardWorld.y, 
-                                           100*wand[0].vectForwardWorld.z ));
+    new Vector3f(100*wand[0].vectForwardWorld.x, 
+    100*wand[0].vectForwardWorld.y, 
+    100*wand[0].vectForwardWorld.z ));
 
     // Align the projectile according to the wand
     ruis.inputManager.wand[0].copyAbsoluteRotation(selProje.rigidBody);
-    
+
     // Add the selectable projectile in to RUIS' dynamic world
     ruis.addObject(selProje);
   }
 
   boolean buttonSdown = false;
-  for(int i = 0; i < inputManager.getWandCount(); ++i)
-    if(wand[i].buttonS)
+  for (int i = 0; i < inputManager.getWandCount(); ++i) {
+    if (wand[i].buttonS) {
       buttonSdown = true;
-      
+    }
+  }
+
   // If space key or S-button is pressed down, bacon slices will spawn
   // underground (and be hurled into the sky because of JBullet's physics)
-  if(buttonSdown || (keyPressed && key == ' '))
+  if (buttonSdown || (keyPressed && key == ' '))
   {
-    float locX = viewManager.display[0].displayCenter.x;
-    float locY = ruis.getStaticFloorY() + 10;
-    float locZ = viewManager.display[0].displayCenter.z;
-    float baconWidth  = 0.2f*viewManager.display[0].getDisplayWidth();
-    float baconHeight = 0.3f*baconWidth;
-    
-    // Create a new bacon slice object
-    BaconSlice baconObj = new BaconSlice(baconWidth, baconHeight, locX, locY, locZ);
-    // Because the BaconSlice is attached to a standard SelectableObject,
-    // it has the same interaction behavior as any SelectableObject
-    SelectableObject selBacon = new SelectableObject(baconObj);
-    ruis.addObject(selBacon);
+    // Bacon is added only once per key strote
+    if (baconAdded == false) {
+      baconAdded = true;
+      float locX = viewManager.display[0].displayCenter.x;
+      float locY = ruis.getStaticFloorY() + 10;
+      float locZ = viewManager.display[0].displayCenter.z;
+      float baconWidth  = 0.2f*viewManager.display[0].getDisplayWidth();
+      float baconHeight = 0.3f*baconWidth;
+
+      // Create a new bacon slice object
+      BaconSlice baconObj = new BaconSlice(baconWidth, baconHeight, locX, locY, locZ);
+      // Because the BaconSlice is attached to a standard SelectableObject,
+      // it has the same interaction behavior as any SelectableObject
+      SelectableObject selBacon = new SelectableObject(baconObj);
+      ruis.addObject(selBacon);
+    }
   }
-  
+
   // Accessing individual Selectables and PhysicalObjects. This is kind of 
   // 'advanced' and not often necessary, so no worries if the below
   // for-loops  seem complex
@@ -341,13 +355,13 @@ public void myInteraction()
   {
     // Get instances that implement the interface Selectable
     Selectable sel = (Selectable) ruis.selectables.get(k);
-    if(sel instanceof SelectableObject)
+    if (sel instanceof SelectableObject)
     {
       // Cast the instance into a specific class that implements the
       // interface, in order to access its public variables.
       SelectableObject selObj = (SelectableObject) sel;
       // SelectableObject's have the physicalObject field
-      if(selObj.physicalObject instanceof BaconSlice)
+      if (selObj.physicalObject instanceof BaconSlice)
         ++baconCount;
     }
   }
@@ -355,16 +369,16 @@ public void myInteraction()
   {
     // Not all PhysicalObjects are Selectables
     PhysicalObject physObj = ruis.physicalObjects.get(k);
-    if(physObj.getShapeFlag() == PhysicalObject.SPHERE_SHAPE)
+    if (physObj.getShapeFlag() == PhysicalObject.SPHERE_SHAPE)
       ++sphereCount;
   }
-  
+
   // Below lines affect only the Kinect tracked skeleton
   // Below makes skeleton0's location and rotation invariant of ruisCamera(),
   // and pushes the skeleton0 700 cm in front of the camera
   skeleton0.setWorldTranslationOffset(
-             PVector.add(viewManager.getCameraLocation(), 
-                         PVector.mult(viewManager.getCameraForward(), 700)));
+  PVector.add(viewManager.getCameraLocation(), 
+  PVector.mult(viewManager.getCameraForward(), 700)));
   PMatrix3D cameraRotation = new PMatrix3D();
   cameraRotation.rotateY( viewManager.getRUIScamRotX());
   cameraRotation.rotateX( viewManager.getRUIScamRotY());
@@ -381,7 +395,7 @@ public void keyPressed()
     if (keyCode == LEFT ) wand3.x -= 0.6; 
     if (keyCode == RIGHT) wand3.x += 0.6;     
     if (keyCode == UP   ) wand3.y -= 0.6; 
-    if (keyCode == DOWN ) wand3.y += 0.6; 
+    if (keyCode == DOWN ) wand3.y += 0.6;
   }
 
   // Rotational control for camera
@@ -391,7 +405,7 @@ public void keyPressed()
   if (key=='n') playerPitch -= 0.02;
   if (key=='c') playerRoll  -= 0.02;
   if (key=='v') playerRoll  += 0.02;
-    
+
   if (key == 'j') lookAtX -= 5;
   if (key == 'l') lookAtX += 5;
   if (key == 'o') lookAtY -= 5;
@@ -437,23 +451,23 @@ public void lightSetup()
 {
   noLights();
   pushMatrix();
-  
+
   lightSpecular(255, 255, 255);
-  
+
   // White point light near the ruisCamera location
   pointLight(255, 255, 255, 
-             viewManager.getCameraLocation().x 
-                                    - 100*viewManager.getCameraForward().x, 
-             viewManager.getCameraLocation().y 
-                        - 0.3f*viewManager.display[0].getDisplayHeight(),
-             viewManager.getCameraLocation().z 
-                                    - 100*viewManager.getCameraForward().z );
+  viewManager.getCameraLocation().x 
+    - 100*viewManager.getCameraForward().x, 
+  viewManager.getCameraLocation().y 
+    - 0.3f*viewManager.display[0].getDisplayHeight(), 
+  viewManager.getCameraLocation().z 
+    - 100*viewManager.getCameraForward().z );
   lightSpecular(0, 0, 0);
-  
-  pointLight(110, 110, 110,   // All gray
-             -600, 0, -600); // Position
-  pointLight(110, 110, 110,   // All gray
-             900, 1800, 0); // Position
+
+  pointLight(110, 110, 110, // All gray
+  -600, 0, -600); // Position
+  pointLight(110, 110, 110, // All gray
+  900, 1800, 0); // Position
   popMatrix();
 }
 
@@ -485,11 +499,11 @@ public void onEndCalibration(int userId, boolean successfull)
   if (successfull) 
   { 
     println("  User calibrated !!!");
-    inputManager.ni.startTrackingSkeleton(userId); 
+    inputManager.ni.startTrackingSkeleton(userId);
   } 
   else 
   { 
-    inputManager.ni.startPoseDetection("Psi",userId);
+    inputManager.ni.startPoseDetection("Psi", userId);
   }
 }
 
