@@ -349,8 +349,14 @@ public void myInteraction()
       float locX = viewManager.display[0].displayCenter.x;
       float locY = ruis.getStaticFloorY() + 10;
       float locZ = viewManager.display[0].displayCenter.z;
-      float baconWidth  = 0.2f*viewManager.display[0].getDisplayWidth();
-      float baconHeight = 0.3f*baconWidth;
+      
+      // float baconWidth  = 0.2f*viewManager.display[0].getDisplayWidth();
+      // float baconHeight = 0.3f*baconWidth;
+      
+      // Bacon size matches to the picture size
+      float imageScaling = 0.5;
+      float baconWidth = 400 * imageScaling;
+      float baconHeight = 300 * imageScaling;
 
       // Create a new bacon slice object
       BaconSlice baconObj = new BaconSlice(baconWidth, baconHeight, locX, locY, locZ);

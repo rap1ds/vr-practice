@@ -17,6 +17,7 @@ import javax.vecmath.*;
 public RUIS ruis;
 public ViewManager viewManager;
 public InputManager inputManager;
+public ImageReader imageReader;
 
 // Width and height in pixels for each rendered screen
 int VIEW_WIDTH  = 640;
@@ -38,6 +39,8 @@ public void setup()
 
   viewManager = new ViewManager(this, VIEW_WIDTH, VIEW_HEIGHT, displayConfigFileName);
   
+  imageReader = new ImageReader(sketchPath + "/pics");
+  
   ruis = new RUIS(this, viewManager, inputManager, ruisConfigFileName);
 
   createShortcuts();
@@ -46,9 +49,6 @@ public void setup()
 
   ruis.physicsThread.start();
   inputManager.inputThread.start();
-  
-  ImageReader imageReader = new ImageReader("/Users/mikko/Work/vr-practice/DoubleWallExample/pics"); // Change this
-  
 }
 
 public void draw()

@@ -1,7 +1,6 @@
 /* Interactive objects.
    Write your dynamic and interactive element classes here */
 
-
 /**
  * This is how you define a new kind of Physical object with its own physical
  * behavior and own graphics rendering method.
@@ -47,6 +46,8 @@ public class ImmaterialSphere extends PhysicalObject
  */
 public class BaconSlice extends PhysicalObject
 {
+  PImage textureImage;
+  
   BaconSlice(float width, float height, float startX, float startY, 
              float startZ                                          )
   {
@@ -55,6 +56,8 @@ public class BaconSlice extends PhysicalObject
     // PhysicalObject constructor with 9 arguments creates a box shape.
     super(width, height, 0.1f*min(width, height), 1 /* mass */, 
           startX, startY, startZ, color(255), PhysicalObject.DYNAMIC_OBJECT);
+          
+    textureImage = imageReader.nextImage();
   }
   
   // Redefine PhysicalObject's renderAtOrigin() method, which draws graphics
@@ -63,11 +66,23 @@ public class BaconSlice extends PhysicalObject
   {
     // Ignore PhysicalObject's default draw method and define your own draw
     // function
-    fill(color(255, 0, 0));
+    // PImage a = loadImage("pic1.png");
+    // texture(a);
+    // fill(color(255, 0, 0));
     noStroke();
-    box(super.width, 0.8f*super.height, super.depth);
+    
+    beginShape();
+    
+    textureMode(NORMALIZED);
+    texture(this.textureImage);
+    vertex(0, 0, 0, 0);
+    vertex(0, super.height, 0, 1);
+    vertex(super.width, super.height, 1, 1);
+    vertex(super.width, 0, 1, 0);
+    endShape();
 
-    fill(color(255, 255, 255));
+    // fill(color(255, 255, 255));
+    /*
     pushMatrix();
     translate(0,  0.45f*super.height, 0);
     box(super.width, 0.1f*super.height, super.depth);
@@ -77,6 +92,7 @@ public class BaconSlice extends PhysicalObject
     translate(0, -0.45f*super.height, 0);
     box(super.width, 0.1f*super.height, super.depth);
     popMatrix();
+    */
     
     // You could also render with OpenGL functions:
 //      translate(-0.5f*super.width, -0.5f*super.height, 0);
