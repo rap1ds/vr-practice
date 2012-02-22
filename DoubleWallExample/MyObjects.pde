@@ -62,40 +62,46 @@ public class TextureCube extends PhysicalObject
     textureMode(NORMALIZED);
     
     // front
+    normal(0,0,1);
     vertex(-1, 1, 1, 0,1);
     vertex( 1, 1, 1, 1,1);
     vertex( 1,-1, 1, 1,0);
     vertex(-1,-1, 1, 0,0);
     
     // back
+    normal(0,0,-1);
     vertex( 1, 1,-1, 0,1);
     vertex(-1, 1,-1, 1,1);
     vertex(-1,-1,-1, 1,0);
     vertex( 1,-1,-1, 0,0);
     
     // right
+    normal(1,0,0);
     vertex( 1, 1, 1, 0,1);
     vertex( 1, 1,-1, 1,1);
     vertex( 1,-1,-1, 1,0);
     vertex( 1,-1, 1, 0,0);
     
     // left
+    normal(-1,0,0);
     vertex(-1, 1,-1, 0,1);
     vertex(-1, 1, 1, 1,1);
     vertex(-1,-1, 1, 1,0);
     vertex(-1,-1,-1, 0,0);
     
     // bottom
+    normal(0,-1,0);
+    vertex(-1, -1, 1, 0,1);
+    vertex( 1, -1, 1, 1,1);
+    vertex( 1, -1,-1, 1,0);
+    vertex(-1, -1,-1, 0,0);
+    
+    // top
+    normal(0,1,0);
     vertex(-1, 1,-1, 0,1);
     vertex( 1, 1,-1, 1,1);
     vertex( 1, 1, 1, 1,0);
     vertex(-1, 1, 1, 0,0);
-    
-    // top
-    vertex(-1,-1, 1, 0,1);
-    vertex( 1,-1, 1, 1,1);
-    vertex( 1,-1,-1, 1,0);
-    vertex(-1,-1,-1, 0,0);
     
     endShape();
     
