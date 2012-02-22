@@ -11,6 +11,7 @@ import ruisKinectLib.RuisSkeleton;
 import ruisKinectLib.RuisSkeletonManager;
 
 import processing.core.*;
+import processing.opengl.*;
 import java.lang.reflect.*;
 import javax.vecmath.*;
 
