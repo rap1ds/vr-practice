@@ -1,5 +1,5 @@
 /* Interactive objects.
-   Write your dynamic and interactive element classes here */
+ Write your dynamic and interactive element classes here */
 
 /**
  * This is how you define a new kind of Physical object with its own physical
@@ -8,23 +8,23 @@
 public class ImmaterialSphere extends PhysicalObject
 {
   ImmaterialSphere(float radius, float startX, 
-              float startY, float startZ, int sphereColor)
+  float startY, float startZ, int sphereColor)
   {
     // This object takes no part in the JBullet's physical simulation because
     // of the PhysicalObject.IMMATERIAL flag. The PhysicalObject constructor
     // with 7 arguments creates a sphere shape, whereas the constructor with 
     // 9 arguments creates a box shape
-    super(radius, 1 /* mass */, startX, startY, startZ,
-        sphereColor, PhysicalObject.IMMATERIAL_OBJECT         );
+    super(radius, 1 /* mass */, startX, startY, startZ, 
+    sphereColor, PhysicalObject.IMMATERIAL_OBJECT         );
   }
-  
+
   // Redefine PhysicalObject's renderAtOrigin() method, which draws graphics
   // without any previous translations or rotations
   public void renderAtOrigin()
   {
     // Call PhysicalObject's default draw method
     super.renderAtOrigin();
-    
+
     // Add some graphical details (2 white boxes around the sphere) 
     fill(color(255));
     noStroke();
@@ -43,137 +43,140 @@ public class ImmaterialSphere extends PhysicalObject
 public class TextureCube extends PhysicalObject
 {
   PImage textureImage;
-  
+  float newScaleFactor;
+  float oldScaleFactor;
+
   TextureCube(PVector dim, PVector loc) {
     super(dim.x, dim.y, dim.z, 1, loc.x, loc.y, loc.z, color(255), PhysicalObject.IMMATERIAL_OBJECT);
-    
+
     textureImage = imageReader.nextImage();
+    
+    this.newScaleFactor = 1;
+    this.oldScaleFactor = 1;
   }
   
+  public void applyScale(float scaleFactor) {
+    this.newScaleFactor = scaleFactor;
+    
+    // The following lines are for debugging
+    // float total = this.oldScaleFactor * this.newScaleFactor;
+    // println("total: " + total + ", old: " + this.oldScaleFactor + ", new: " + this.newScaleFactor);
+  }
+  
+  public void endScaling() {
+    this.oldScaleFactor = this.oldScaleFactor * this.newScaleFactor;
+    this.newScaleFactor = 1;
+  }
+
   public void renderAtOrigin() {
     noStroke();
     
+    float scaleFactor = this.oldScaleFactor * this.newScaleFactor;
+
     pushMatrix();
-    scale(super.width, super.height, super.depth);
-    
+    scale(super.width * scaleFactor, super.height * scaleFactor, super.depth);
+
     beginShape(QUADS);
 
     texture(this.textureImage);
     textureMode(NORMALIZED);
-    
+
     // front
-    normal(0,0,1);
-    vertex(-1, 1, 1, 0,1);
-    vertex( 1, 1, 1, 1,1);
-    vertex( 1,-1, 1, 1,0);
-    vertex(-1,-1, 1, 0,0);
-    
+    normal(0, 0, 1);
+    vertex(-1, 1, 1, 0, 1);
+    vertex( 1, 1, 1, 1, 1);
+    vertex( 1, -1, 1, 1, 0);
+    vertex(-1, -1, 1, 0, 0);
+
     // back
-    normal(0,0,-1);
-    vertex( 1, 1,-1, 0,1);
-    vertex(-1, 1,-1, 1,1);
-    vertex(-1,-1,-1, 1,0);
-    vertex( 1,-1,-1, 0,0);
-    
+    normal(0, 0, -1);
+    vertex( 1, 1, -1, 0, 1);
+    vertex(-1, 1, -1, 1, 1);
+    vertex(-1, -1, -1, 1, 0);
+    vertex( 1, -1, -1, 0, 0);
+
     // right
-    normal(1,0,0);
-    vertex( 1, 1, 1, 0,1);
-    vertex( 1, 1,-1, 1,1);
-    vertex( 1,-1,-1, 1,0);
-    vertex( 1,-1, 1, 0,0);
-    
+    normal(1, 0, 0);
+    vertex( 1, 1, 1, 0, 1);
+    vertex( 1, 1, -1, 1, 1);
+    vertex( 1, -1, -1, 1, 0);
+    vertex( 1, -1, 1, 0, 0);
+
     // left
-    normal(-1,0,0);
-    vertex(-1, 1,-1, 0,1);
-    vertex(-1, 1, 1, 1,1);
-    vertex(-1,-1, 1, 1,0);
-    vertex(-1,-1,-1, 0,0);
-    
+    normal(-1, 0, 0);
+    vertex(-1, 1, -1, 0, 1);
+    vertex(-1, 1, 1, 1, 1);
+    vertex(-1, -1, 1, 1, 0);
+    vertex(-1, -1, -1, 0, 0);
+
     // bottom
-    normal(0,-1,0);
-    vertex(-1, -1, 1, 0,1);
-    vertex( 1, -1, 1, 1,1);
-    vertex( 1, -1,-1, 1,0);
-    vertex(-1, -1,-1, 0,0);
-    
+    normal(0, -1, 0);
+    vertex(-1, -1, 1, 0, 1);
+    vertex( 1, -1, 1, 1, 1);
+    vertex( 1, -1, -1, 1, 0);
+    vertex(-1, -1, -1, 0, 0);
+
     // top
-    normal(0,1,0);
-    vertex(-1, 1,-1, 0,1);
-    vertex( 1, 1,-1, 1,1);
-    vertex( 1, 1, 1, 1,0);
-    vertex(-1, 1, 1, 0,0);
-    
+    normal(0, 1, 0);
+    vertex(-1, 1, -1, 0, 1);
+    vertex( 1, 1, -1, 1, 1);
+    vertex( 1, 1, 1, 1, 0);
+    vertex(-1, 1, 1, 0, 0);
+
     endShape();
-    
+
     popMatrix();
   }
 }
-/**
- * This is how you define a new kind of PhysicalObject with its own physical
- * behavior and own graphics rendering method.
- */
-public class BaconSlice extends PhysicalObject
-{
-  PImage textureImage;
-  
-  BaconSlice(float width, float height, float startX, float startY, 
-             float startZ                                          )
-  {
-    // This object behaves like a rigid object in JBullet's physical 
-    // simulation because of the PhysicalObject.DYNAMIC flag. The 
-    // PhysicalObject constructor with 9 arguments creates a box shape.
-    super(width, height, 0.1f*min(width, height), 1 /* mass */, 
-          startX, startY, startZ, color(255), PhysicalObject.DYNAMIC_OBJECT);
-          
-    textureImage = imageReader.nextImage();
-  }
-  
-  // Redefine PhysicalObject's renderAtOrigin() method, which draws graphics
-  // without any previous translations or rotations
-  public void renderAtOrigin()
-  {
-    // Ignore PhysicalObject's default draw method and define your own draw
-    // function
-    // PImage a = loadImage("pic1.png");
-    // texture(a);
-    // fill(color(255, 0, 0));
-    noStroke();
-    
-    beginShape();
-    
-    textureMode(NORMALIZED);
-    texture(this.textureImage);
-    vertex(0, 0, 0, 0);
-    vertex(0, super.height, 0, 1);
-    vertex(super.width, super.height, 1, 1);
-    vertex(super.width, 0, 1, 0);
-    endShape();
 
-    // fill(color(255, 255, 255));
-    /*
-    pushMatrix();
-    translate(0,  0.45f*super.height, 0);
-    box(super.width, 0.1f*super.height, super.depth);
-    popMatrix();
-    
-    pushMatrix();
-    translate(0, -0.45f*super.height, 0);
-    box(super.width, 0.1f*super.height, super.depth);
-    popMatrix();
-    */
-    
-    // You could also render with OpenGL functions:
-//      translate(-0.5f*super.width, -0.5f*super.height, 0);
-//      viewManager.pgl.beginGL();
-//      viewManager.gl.glBegin( GL.GL_TRIANGLE_STRIP );
-//      viewManager.gl.glColor4f( 1, 0, 0, 1 );
-//      viewManager.gl.glVertex3f( 0, 0, 0 );
-//      viewManager.gl.glVertex3f( super.width, 0, 0 );
-//      viewManager.gl.glVertex3f( 0, super.height, 0 );
-//      viewManager.gl.glVertex3f( super.width, super.height, 0 );
-//      viewManager.gl.glEnd();
-//      viewManager.pgl.endGL();
-//      viewManager.cleanOpenGlChanges();
+public class SelectableCube extends SelectableObject
+{
+  private TextureCube cube;
+  private boolean scaling;
+  private boolean scalingStarted;
+  private float initialDistance;
+
+  public SelectableCube(TextureCube cube)
+  {
+    super(cube);
+    this.cube = cube;
+
+    this.scaling = false;
+    this.scalingStarted = false;
+  }
+
+  public void whileObjectSelection(int wandID)
+  {
+    super.whileObjectSelection(wandID);
+
+    // distance
+    float Dx = wand0.x - wand3.x;
+    float Dy = wand0.y - wand3.y;
+    float Dz = wand0.z - wand3.z;
+
+    float distanceBetweenWands = sqrt(Dx*Dx + Dy*Dy + Dz*Dz);
+
+    // keyCode 16 is right shift key
+    if (wand3.buttonX || keyPressed && keyCode == 16) { 
+      if (!scalingStarted) {
+        scalingStarted = true;
+        initialDistance = distanceBetweenWands;
+      } 
+      else {
+        scaling = true;
+        
+        // Do scaling
+        float scale = distanceBetweenWands / initialDistance;
+        
+        this.cube.applyScale(scale);
+      }
+    } 
+    else {
+      scalingStarted = false;
+      scaling = false;
+      
+      this.cube.endScaling();
+    }
   }
 }
 
@@ -183,7 +186,7 @@ public class SelectableSwitch extends SelectableObject
   public float screenRelativeX;
   public float screenRelativeY;
   public float zDisplace = 0;
-  
+
   public SelectableSwitch(PhysicalObject ruisObject, float relX, float relY)
   {
     super(ruisObject);
@@ -205,7 +208,7 @@ public class SelectableSwitch extends SelectableObject
   // Executes once just after the selection button is released
   public void releaseObjectSelection(int wandID)
   {
-    if(switchOn)
+    if (switchOn)
     {
       this.physicalObject.fillColor = color(30, 110, 80);
       ruis.setGlobalGravity(new PVector(0, 0, 0));
@@ -234,7 +237,7 @@ public class SelectableSwitch extends SelectableObject
     float locZ = screen2WorldZ(screenRelativeX, screenRelativeY, 0);
     this.physicalObject.setLocation(locX, locY, locZ);
     this.physicalObject.setRotation(
-                       RUIS.inverseRotation(viewManager.getRUIScamRotMat()));
+    RUIS.inverseRotation(viewManager.getRUIScamRotMat()));
   }
 
   public void render()
@@ -244,7 +247,7 @@ public class SelectableSwitch extends SelectableObject
     viewManager.inverseCameraRotation();
     translate(0, 0, zDisplace);
     viewManager.applyCameraRotation();
-    
+
     super.render();
     popMatrix();
   }
@@ -252,4 +255,4 @@ public class SelectableSwitch extends SelectableObject
   // SelectableSwitch inherits highlightWouldBeSelected() and getRigidBody()
   // from SelectableObject
 }
-  
+

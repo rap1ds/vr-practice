@@ -1,9 +1,6 @@
 /* The application logic is here */
 
 // Your global variables:
-int sphereCount = 0;
-int baconCount = 0;
-
 float playerX =  0; 
 float playerY =  0; 
 float playerZ =  0; 
@@ -13,15 +10,6 @@ float lookAtZ = 0;
 float playerYaw   = 0; 
 float playerPitch = 0; 
 float playerRoll  = 0; 
-
-// Bacon is added only once per key stroke
-boolean prevButtonSdown = false;
-boolean baconAdded = false;
-void keyReleased() {
-  if(key == ' ') {
-    baconAdded = false;
-  }
-}
 
 PVector incrementalMove = new PVector(0, 0, 0);
 
@@ -37,7 +25,7 @@ public void mySetup()
   lookAtX = viewManager.display[0].displayCenter.x;
   lookAtY = viewManager.display[0].displayCenter.y;
   lookAtZ = viewManager.display[0].displayCenter.z;
-  
+
   // Create selectable TextureCube objects
   for (int i = 0; i < imageReader.count(); i++) {
     PImage img = imageReader.at(i);
@@ -46,30 +34,30 @@ public void mySetup()
 
     // Suggested by RUIS to keep units uniform over different environments
     float scaling = viewManager.display[0].getDisplayWidth();
-    
+
     // spacing between two items' center location
     float spacing = 0.1f * scaling;
-    
+
     // radius of the "spiral"
     float radius = 0.1f * scaling;
-    
+
     float aspect = (float)img.height / (float)img.width;
-    
+
     // size of the cube
     float width = 0.2f * scaling;
     float height = 0.2f * aspect * scaling;
     float depth = 0.02f * scaling; // actually half-depth
-    
+
     // calculate offset in polar coordinates for (x,y)
     float t = ((float)i / imageReader.count()) * TWO_PI;
     float locX = viewManager.display[0].displayCenter.x + radius * cos(t);
     float locY = viewManager.display[0].displayCenter.y + radius * sin(t);
     float locZ = viewManager.display[0].displayCenter.z - i * spacing;
-    
+
     // Create a selectable texture cube object
     TextureCube cubeObj = new TextureCube(new PVector(width, height, depth), new PVector(locX, locY, locZ));
-    
-    SelectableObject selCube = new SelectableObject(cubeObj);
+
+    SelectableCube selCube = new SelectableCube(cubeObj);
     ruis.addObject(selCube);
   }
 
@@ -216,15 +204,6 @@ public void myDraw(int viewID)
 
   relativeScreenX = 0.8f;
   relativeScreenY = 0.95f;
-  // Render magenta text in a fixed position on the view HUD
-  viewManager.renderText("Bacon: " + Integer.toString(baconCount), 
-  relativeScreenX, relativeScreenY, 
-  color(255, 130, 255), 1 /* textScale */, 
-  displayID                                );
-  viewManager.renderText("Spheres: " + Integer.toString(sphereCount), 
-  relativeScreenX, relativeScreenY-0.1f, 
-  color(255, 130, 255), 1 /* textScale */, 
-  displayID                               ); 
 
   // Draws edge lines of all RigidBodies. Should only be used for 
   // debugging physics, because this function uses slow drawing methods
@@ -286,116 +265,7 @@ public void myInteraction()
 
   // If wand0 is a mouse, you can simulate the 3-axis rotation
   if (wand0 instanceof MouseWand)
-    wand[0].simulateRotation(1.5f);
-
-  // X-button of of wand0 is simulated with right mouse button.
-  if ( wand[0].buttonX )
-  {
-    // Shoot into the scene a new physically simulated, white cube projectile 
-    // that can be selected by the user. 
-    float cubeSideLenght = 0.1f*viewManager.display[0].getDisplayWidth();
-    float cubeMass = 10;
-    float locX = wand[0].worldX;
-    float locY = wand[0].worldY;
-    float locZ = wand[0].worldZ;
-
-    // Create the projectile's graphical and physics simulation representation
-    PhysicalObject wandProjectile = 
-      new PhysicalObject(cubeSideLenght, cubeSideLenght, 
-    cubeSideLenght, cubeMass, locX, locY, locZ, 
-    color(255, 200, 235), PhysicalObject.DYNAMIC_OBJECT);
-
-    // Equip that representation with basic interaction features from SelectableObject
-    SelectableObject selProje = new SelectableObject(wandProjectile);
-
-    // Launch the projectile into the direction where the wand is pointing 
-    selProje.rigidBody.setLinearVelocity(
-    new Vector3f(100*wand[0].vectForwardWorld.x, 
-    100*wand[0].vectForwardWorld.y, 
-    100*wand[0].vectForwardWorld.z ));
-
-    // Align the projectile according to the wand
-    ruis.inputManager.wand[0].copyAbsoluteRotation(selProje.rigidBody);
-
-    // Add the selectable projectile in to RUIS' dynamic world
-    ruis.addObject(selProje);
-  }
-
-  boolean buttonSdown = false;
-  for (int i = 0; i < inputManager.getWandCount(); ++i) {
-    if (wand[i].buttonS) {
-      buttonSdown = true;
-    }
-  }
-  
-  // Detect if button was just released
-  boolean buttonSdownStateChanged = prevButtonSdown != buttonSdown;
-  
-  if(buttonSdownStateChanged) {
-    // Just released
-    if(!buttonSdown) {
-      // Reset baceonAdded
-      baconAdded = false;
-    }
-  }
-  
-  // Save the buttonSdown state so that we can detect when button is released
-  prevButtonSdown = buttonSdown;
-
-  // If space key or S-button is pressed down, bacon slices will spawn
-  // underground (and be hurled into the sky because of JBullet's physics)
-  if (buttonSdown || (keyPressed && key == ' '))
-  {
-    // Bacon is added only once per key strote
-    if (baconAdded == false) {
-      baconAdded = true;
-      float locX = viewManager.display[0].displayCenter.x;
-      float locY = ruis.getStaticFloorY() + 10;
-      float locZ = viewManager.display[0].displayCenter.z;
-      
-      // float baconWidth  = 0.2f*viewManager.display[0].getDisplayWidth();
-      // float baconHeight = 0.3f*baconWidth;
-      
-      // Bacon size matches to the picture size
-      float imageScaling = 0.5;
-      float baconWidth = 400 * imageScaling;
-      float baconHeight = 300 * imageScaling;
-
-      // Create a new bacon slice object
-      BaconSlice baconObj = new BaconSlice(baconWidth, baconHeight, locX, locY, locZ);
-      // Because the BaconSlice is attached to a standard SelectableObject,
-      // it has the same interaction behavior as any SelectableObject
-      SelectableObject selBacon = new SelectableObject(baconObj);
-      ruis.addObject(selBacon);
-    }
-  }
-
-  // Accessing individual Selectables and PhysicalObjects. This is kind of 
-  // 'advanced' and not often necessary, so no worries if the below
-  // for-loops  seem complex
-  sphereCount = 0;
-  baconCount  = 0;
-  for ( int k = 0; k < ruis.selectables.size(); k++ )
-  {
-    // Get instances that implement the interface Selectable
-    Selectable sel = (Selectable) ruis.selectables.get(k);
-    if (sel instanceof SelectableObject)
-    {
-      // Cast the instance into a specific class that implements the
-      // interface, in order to access its public variables.
-      SelectableObject selObj = (SelectableObject) sel;
-      // SelectableObject's have the physicalObject field
-      if (selObj.physicalObject instanceof BaconSlice)
-        ++baconCount;
-    }
-  }
-  for ( int k = 0; k < ruis.physicalObjects.size(); k++ )
-  {
-    // Not all PhysicalObjects are Selectables
-    PhysicalObject physObj = ruis.physicalObjects.get(k);
-    if (physObj.getShapeFlag() == PhysicalObject.SPHERE_SHAPE)
-      ++sphereCount;
-  }
+   wand[0].simulateRotation(1.5f);
 
   // Below lines affect only the Kinect tracked skeleton
   // Below makes skeleton0's location and rotation invariant of ruisCamera(),
@@ -412,7 +282,7 @@ public void myInteraction()
 
 // Keyboard user interface
 public void keyPressed()
-{
+{ 
   // Location control for wand3 which is simulated with keyboard
   if (key == CODED && wand3 != null)
   {
