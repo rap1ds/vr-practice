@@ -29,6 +29,7 @@ String inputConfigFileName = "inputConfig.xml";
 String ruisConfigFileName = "ruisConfig.xml";
 
 boolean wandInfoPrinted = false;
+PImage imageOverlay = null;
 
 public void setup()
 { 

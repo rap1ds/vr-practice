@@ -202,6 +202,13 @@ public void myDraw(int viewID)
 
   popMatrix();
 
+  if (imageOverlay != null) {
+    hint(DISABLE_DEPTH_TEST);
+    imageMode(CENTER);
+    image(imageOverlay, 0, 0, viewManager.display[0].getDisplayWidth(),
+          viewManager.display[0].getDisplayHeight());
+  }
+
   relativeScreenX = 0.8f;
   relativeScreenY = 0.95f;
 
@@ -339,6 +346,10 @@ public void mouseDragged()
 public void mouseReleased()
 {
   viewManager.setKeystoneSelected(false);
+}
+
+public void mousePressed() {
+  if (imageOverlay != null) imageOverlay = null;
 }
 
 public void lightSetup()
