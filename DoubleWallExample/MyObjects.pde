@@ -148,6 +148,7 @@ public class SelectableCube extends SelectableObject
   public void initObjectSelection(int wandID)
   {
     imageOverlay = this.cube.textureImage;
+    scaleImageOverlay();
   }
 
   public void whileObjectSelection(int wandID)
