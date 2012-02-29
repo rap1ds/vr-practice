@@ -135,6 +135,7 @@ public class SelectableCube extends SelectableObject
   private boolean scaling;
   private boolean scalingStarted;
   private float initialDistance;
+  private Date clicked;
 
   public SelectableCube(TextureCube cube)
   {
@@ -147,8 +148,15 @@ public class SelectableCube extends SelectableObject
 
   public void initObjectSelection(int wandID)
   {
-    imageOverlay = this.cube.textureImage;
-    scaleImageOverlay();
+    clicked = new Date();
+  }
+  
+  public void releaseObjectSelection(int wandID)
+  {
+    if (new Date().getTime() - clicked.getTime() < 200) {
+      imageOverlay = this.cube.textureImage;
+      scaleImageOverlay();
+    }
   }
 
   public void whileObjectSelection(int wandID)
